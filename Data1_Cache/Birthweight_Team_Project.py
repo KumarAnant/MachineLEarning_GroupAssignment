@@ -195,10 +195,6 @@ sns.distplot(birthweight['mage'],
 plt.xlabel('mage')
 
 
-sns.boxplot(x =birthweight['mage'])
-plt.show()
-
-
 ########################
 
 
@@ -207,7 +203,7 @@ sns.distplot(birthweight['meduc'],
              color = 'y')
 
 plt.xlabel('meduc')
-plt.show()
+
 
 
 ########################
@@ -348,10 +344,10 @@ birthweight_quantiles = birthweight.loc[:, :].quantile([0.05,
                                                 0.60,
                                                 0.80,
                                                 0.95])
-birthweight_quantiles = birthweight.loc[:, :].quantile([0.02,                                                
+birthweight_quantiles = birthweight.loc[:, :].quantile([0.05,                                                
                                                 0.98])
 
-print(birthweight_quantiles['mage'])
+
 """
 
 Assumed Continuous/Interval Variables - 
@@ -384,23 +380,23 @@ Father others
 # Outlier flags
 mage_low = 20
 
-mage_high = 55
+mage_high=40
 
 overall_low_meduc = 10
 
-monpre_low = 0
+monpre_low=0.5
 
-monpre_high = 7
+monpre_high=4
 
-npvis_low = 5
+npvis_low = 7
 
-npvis_high = 18
+npvis_high = 16
 
 fage_low = 20
 
-fage_high = 62
+fage_high = 45
 
-overall_low_feduc = 7
+overall_low_feduc = 10
 
 overall_low_omaps = 5
 

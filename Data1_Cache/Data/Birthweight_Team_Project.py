@@ -22,8 +22,8 @@ import statsmodels.formula.api as smf # regression modeling
 import sklearn.metrics # more metrics for model performance evaluation
 from sklearn.model_selection import cross_val_score # k-folds cross validation
 
-os.chdir('E:/OneDrive/Hult/Machine Learning/Assignments/Group Assignment/Data2')
-file = 'birthweight_feature_set.xlsx'
+os.chdir('E:/OneDrive/Hult/Machine Learning/Assignments/Group Assignment/Data')
+file = 'birthweight.xlsx'
 
 birthweight = pd.read_excel(file)
 
@@ -109,40 +109,35 @@ sns.distplot(df_dropped['fmaps']) #TAKE THE MEAN
 sns.distplot(df_dropped['cigs']) #NOT
 sns.distplot(df_dropped['drink']) #zero inflated
 
-# # drink is zero inflated. Imputing with zero.
-# fill = 0
+# drink is zero inflated. Imputing with zero.
+fill = 0
 
-
-# birthweight['drink'] = birthweight['drink'].fillna(fill)
+birthweight['drink'] = birthweight['drink'].fillna(fill)
 
 #MEAN IMPUTATION FOR NPVIS VARIABLE
-
-fill = birthweight['npvis'].median()
+fill = birthweight['npvis'].mean()
 
 birthweight['npvis'] = birthweight['npvis'].fillna(fill)
 
 #MEAN IMPUTATION FOR FAGE VARIABLE
+fill = birthweight['fage'].mean()
 
-# fill = birthweight['fage'].mean()
+birthweight['fage'] = birthweight['fage'].fillna(fill)
 
-# birthweight['fage'] = birthweight['fage'].fillna(fill)
+#MEAN IMPUTATION FOR FMAPS
+fill = birthweight['fmaps'].mean()
 
-# #MEAN IMPUTATION FOR FMAPS
+birthweight['fmaps'] = birthweight['fmaps'].fillna(fill)
 
-# fill = birthweight['fmaps'].median()
-
-# birthweight['fmaps'] = birthweight['fmaps'].fillna(fill)
-
-# #EVERYTHING ELSE FILLED WITH MEDIAN
-
+#EVERYTHING ELSE FILLED WITH MEDIAN
 fill = birthweight['meduc'].median()
 
 birthweight['meduc'] = birthweight['meduc'].fillna(fill)
 
 
-# fill = birthweight['monpre'].median()
+fill = birthweight['monpre'].median()
 
-# birthweight['monpre'] = birthweight['monpre'].fillna(fill)
+birthweight['monpre'] = birthweight['monpre'].fillna(fill)
 
 
 fill = birthweight['feduc'].median()
@@ -150,14 +145,14 @@ fill = birthweight['feduc'].median()
 birthweight['feduc'] = birthweight['feduc'].fillna(fill)
 
 
-# fill = birthweight['omaps'].median()
+fill = birthweight['omaps'].median()
 
-# birthweight['omaps'] = birthweight['omaps'].fillna(fill)
+birthweight['omaps'] = birthweight['omaps'].fillna(fill)
 
 
-# fill = birthweight['cigs'].median()
+fill = birthweight['cigs'].median()
 
-# birthweight['cigs'] = birthweight['cigs'].fillna(fill)
+birthweight['cigs'] = birthweight['cigs'].fillna(fill)
 
 # Checking the overall dataset to verify that there are no missing values remaining
 print(
@@ -195,10 +190,6 @@ sns.distplot(birthweight['mage'],
 plt.xlabel('mage')
 
 
-sns.boxplot(x =birthweight['mage'])
-plt.show()
-
-
 ########################
 
 
@@ -207,7 +198,7 @@ sns.distplot(birthweight['meduc'],
              color = 'y')
 
 plt.xlabel('meduc')
-plt.show()
+
 
 
 ########################
@@ -348,10 +339,8 @@ birthweight_quantiles = birthweight.loc[:, :].quantile([0.05,
                                                 0.60,
                                                 0.80,
                                                 0.95])
-birthweight_quantiles = birthweight.loc[:, :].quantile([0.02,                                                
-                                                0.98])
 
-print(birthweight_quantiles['mage'])
+
 """
 
 Assumed Continuous/Interval Variables - 
@@ -384,23 +373,23 @@ Father others
 # Outlier flags
 mage_low = 20
 
-mage_high = 55
+mage_high=40
 
 overall_low_meduc = 10
 
-monpre_low = 0
+monpre_low=0.5
 
-monpre_high = 7
+monpre_high=4
 
-npvis_low = 5
+npvis_low = 7
 
-npvis_high = 18
+npvis_high = 16
 
 fage_low = 20
 
-fage_high = 62
+fage_high = 45
 
-overall_low_feduc = 7
+overall_low_feduc = 10
 
 overall_low_omaps = 5
 
@@ -413,22 +402,6 @@ bwght_low = 2000
 bwght_high = 4500
 
 overall_drink = 1
-
-########################
-# Create a new column for Race and cEdu
-
-birthweight['race'] = 0
-birthweight['cEdu'] = 0
-
-for val in enumerate(birthweight.loc[ : , 'fwhte']):
-      birthweight.loc[val[0], 'race'] =   str(birthweight.loc[val[0], 'mwhte']) + \
-                                          str(birthweight.loc[val[0], 'mblck']) + \
-                                          str(birthweight.loc[val[0], 'moth']) + \
-                                          str(birthweight.loc[val[0], 'fwhte']) + \
-                                          str(birthweight.loc[val[0], 'fblck']) + \
-                                          str(birthweight.loc[val[0], 'foth'])
-      birthweight.loc[val[0], 'cEdu'] =   birthweight.loc[val[0], 'meduc'] + \
-                                          birthweight.loc[val[0], 'feduc']
 
 ########################
 # Creating Outlier Flags
@@ -568,8 +541,6 @@ for val in enumerate(birthweight.loc[ : , 'drink']):
     if val[1] <= overall_drink:
         birthweight.loc[val[0], 'out_drink'] = -1
 
-
-
 ###############################################################################
 # Correlation Analysis
 ###############################################################################
@@ -623,39 +594,25 @@ print(birthweight.head())
 
 fmaps_dummies = pd.get_dummies(list(birthweight['fmaps']), prefix = 'fmaps', drop_first = True)
 drink_dummies = pd.get_dummies(list(birthweight['drink']), prefix = 'drink', drop_first = True)
-meduc_dummies = pd.get_dummies(list(birthweight['meduc']), prefix = 'meduc', drop_first = True)
-race_dummies = pd.get_dummies(list(birthweight['race']), prefix = 'race', drop_first = True)
-# male_dummies = pd.get_dummies(list(birthweight['male']), prefix = 'male', drop_first = True)
-# mwhte_dummies = pd.get_dummies(list(birthweight['mwhte']), prefix = 'mwhte', drop_first = True)
-# mblck_dummies = pd.get_dummies(list(birthweight['mblck']), prefix = 'mblck', drop_first = True)
-# moth_dummies = pd.get_dummies(list(birthweight['moth']), prefix = 'moth', drop_first = True)
-# fwhte_dummies = pd.get_dummies(list(birthweight['fwhte']), prefix = 'fwhte', drop_first = True)
-# fblck_dummies = pd.get_dummies(list(birthweight['fblck']), prefix = 'fblck', drop_first = True)
-# foth_dummies = pd.get_dummies(list(birthweight['foth']), prefix = 'foth', drop_first = True)
+male_dummies = pd.get_dummies(list(birthweight['male']), prefix = 'male', drop_first = True)
+mwhte_dummies = pd.get_dummies(list(birthweight['mwhte']), prefix = 'mwhte', drop_first = True)
+mblck_dummies = pd.get_dummies(list(birthweight['mblck']), prefix = 'mblck', drop_first = True)
+moth_dummies = pd.get_dummies(list(birthweight['moth']), prefix = 'moth', drop_first = True)
+fwhte_dummies = pd.get_dummies(list(birthweight['fwhte']), prefix = 'fwhte', drop_first = True)
+fblck_dummies = pd.get_dummies(list(birthweight['fblck']), prefix = 'fblck', drop_first = True)
+foth_dummies = pd.get_dummies(list(birthweight['foth']), prefix = 'foth', drop_first = True)
 
 birthweight_2 = pd.concat(
         [birthweight.loc[:,:],
-         fmaps_dummies, drink_dummies, 
-         meduc_dummies, race_dummies],
+         fmaps_dummies, drink_dummies],
          axis = 1)
 
-birthweight_2.columns
+birthweight_2['fmaps_5.0']
+birthweight_2.shape
 
 
 lm_full = smf.ols(formula = """bwght ~    mage +
-                                          birthweight_2['meduc_5.0'] +
-                                          birthweight_2['meduc_6.0'] +
-                                          birthweight_2['meduc_7.0'] +
-                                          birthweight_2['meduc_8.0'] +
-                                          birthweight_2['meduc_9.0'] +
-                                          birthweight_2['meduc_10.0'] +
-                                          birthweight_2['meduc_11.0'] +
-                                          birthweight_2['meduc_12.0'] +
-                                          birthweight_2['meduc_13.0'] +
-                                          birthweight_2['meduc_14.0'] +
-                                          birthweight_2['meduc_15.0'] +
-                                          birthweight_2['meduc_16.0'] +
-                                          birthweight_2['meduc_17.0'] +
+                                          meduc +
                                           monpre +
                                           npvis +
                                           fage +
@@ -665,7 +622,8 @@ lm_full = smf.ols(formula = """bwght ~    mage +
                                           birthweight_2['fmaps_6.0'] +
                                           birthweight_2['fmaps_7.0'] +
                                           birthweight_2['fmaps_8.0'] +
-                                          birthweight_2['fmaps_9.0'] +                                          
+                                          birthweight_2['fmaps_9.0'] +
+                                          birthweight_2['fmaps_9.003827227993439'] +
                                           birthweight_2['fmaps_10.0'] +
                                           cigs +
                                           birthweight_2['drink_1.0'] +
@@ -679,16 +637,7 @@ lm_full = smf.ols(formula = """bwght ~    mage +
                                           moth +
                                           fwhte +
                                           fblck +
-                                          foth +
-                                          birthweight_2['race_001010'] +
-                                          birthweight_2['race_001100'] +
-                                          birthweight_2['race_010001'] +
-                                          birthweight_2['race_010010'] +
-                                          birthweight_2['race_010100'] +
-                                          birthweight_2['race_100001'] +
-                                          birthweight_2['race_100010'] +
-                                          birthweight_2['race_100100'] +
-                                          birthweight_2['cEdu'] +
+                                          foth +                                          
                                           m_meduc +
                                           m_monpre +
                                           m_npvis +
@@ -723,8 +672,6 @@ results.pvalues
 
 print(results.summary())
 
-rsq_lm_full = results.rsquared_adj.round(3)
-
 print(f"""
 Summary Statistics:
 R-Squared:          {results.rsquared.round(3)}
@@ -740,9 +687,8 @@ lm_significant = smf.ols(formula = """bwght ~   monpre +
                                                 npvis +                                                
                                                 fage +
                                                 birthweight_2['fmaps_9.0'] +
-                                                birthweight_2['fmaps_10.0'] +  
-                                                birthweight_2['meduc_9.0'] +
-                                                birthweight_2['meduc_10.0'] +
+                                                birthweight_2['fmaps_10.0'] +
+                                                omaps +
                                                 fmaps +
                                                 cigs +
                                                 male +
@@ -751,10 +697,6 @@ lm_significant = smf.ols(formula = """bwght ~   monpre +
                                                 moth +
                                                 fwhte +
                                                 fblck +
-                                                birthweight_2['race_001100'] +
-                                                birthweight_2['race_010001'] +
-                                                birthweight_2['race_100100'] +  
-                                                m_meduc +                                              
                                                 m_fage +
                                                 m_omaps +
                                                 m_fmaps +
@@ -763,7 +705,7 @@ lm_significant = smf.ols(formula = """bwght ~   monpre +
                                                 out_drink
                                                 """,
                   data = birthweight_2)
-
+results.summary()
 # Fitting Results
 results = lm_significant.fit()
 
@@ -772,7 +714,7 @@ results = lm_significant.fit()
 # Printing Summary Statistics
 print(results.summary())
 
-rsq_lm_significant = results.rsquared_adj.round(3)
+
 
 print(f"""
 Summary Statistics:
@@ -781,13 +723,11 @@ Adjusted R-Squared: {results.rsquared_adj.round(3)}
 """)
 
 
-#########################################
-######### KNN FUll Model ################
-#########################################
 
-birthweight_data = birthweight_2.drop(['bwght'], axis = 1)
 
-birthweight_target = birthweight_2.loc[:, 'bwght']
+birthweight_data = birthweight.drop(['bwght'], axis = 1)
+
+birthweight_target = birthweight.loc[:, 'bwght']
 
 X_train, X_test, y_train, y_test = train_test_split(
             birthweight_data,
@@ -807,7 +747,9 @@ print(y_test.shape)
 # used in statsmodels
 birthweight_train = pd.concat([X_train, y_train], axis = 1)
 
-
+#########################################
+######### KNN FUll Model ################
+#########################################
 
 ########################
 # Step 1: Create a model object
@@ -856,31 +798,15 @@ print(y_score)
 
 lm_significant = smf.ols(formula = """bwght ~   monpre +
                                                 npvis +                                                
-                                                fage +
-                                                birthweight_train['fmaps_9.0'] +
-                                                birthweight_train['fmaps_10.0'] +  
-                                                birthweight_train['meduc_9.0'] +
-                                                birthweight_train['meduc_10.0'] +
+                                                omaps +
                                                 fmaps +
                                                 cigs +
                                                 male +
-                                                mwhte + 
-                                                mblck +                                                                                               
-                                                moth +
                                                 fwhte +
-                                                fblck +
-                                                birthweight_train['race_001100'] +
-                                                birthweight_train['race_010001'] +
-                                                birthweight_train['race_100100'] +  
-                                                m_meduc +                                              
-                                                m_fage +
-                                                m_omaps +
-                                                m_fmaps +
-                                                out_fage +                                                
-                                                out_bwght +
-                                                out_drink-1
+                                                fblck 
                                                 """,
                   data = birthweight_train)
+
 # Fitting Results
 results = lm_significant.fit()
 
@@ -889,40 +815,20 @@ results = lm_significant.fit()
 # Printing Summary Statistics
 print(results.summary())
 
-rsq_lm_stat_significant = results.rsquared_adj.round(3)
-
 ###############################################################################
 # Applying the Optimal Model in scikit-learn
 ###############################################################################
-birthweight_data   = birthweight_2.loc[:,['monpre',
+birthweight_data   = birthweight.loc[:,[  'monpre',
                                           'npvis',                                                
-                                          'fage',
-                                          'fmaps_9.0',
-                                          'fmaps_10.0',
-                                          'meduc_9.0',
-                                          'meduc_10.0',
+                                          'omaps',
                                           'fmaps',
                                           'cigs',
                                           'male',
-                                          'mwhte' ,
-                                          'mblck'                                                                                             ,
-                                          'moth',
                                           'fwhte',
-                                          'fblck',
-                                          'race_001100',
-                                          'race_010001',
-                                          'race_100100',
-                                          'm_meduc',
-                                          'm_fage',
-                                          'm_omaps',
-                                          'm_fmaps',
-                                          'out_fage'                                                ,
-                                          'out_bwght',
-                                          'out_drink'
-                                          ]]
+                                          'fblck']]
 
 # Preparing the target variable
-birthweight_target = birthweight_2.loc[:, 'bwght']
+birthweight_target = birthweight.loc[:, 'bwght']
 
 
 # Same code as before
@@ -970,7 +876,7 @@ print(test_accuracy)
 print("Best test accuracy at N = ",test_accuracy.index(max(test_accuracy)))
 
 ########################
-# The best results occur when k = 10.
+# The best results occur when k = 33.
 ########################
 
 # Building a model with k = 14
@@ -1029,8 +935,8 @@ Test set predictions:
 {y_pred.round(2)}
 """)
 
-# # Scoring the model
-# y_score_ols_optimal = lr_fit.score(X_test, y_test)
+# Scoring the model
+y_score_ols_optimal = lr_fit.score(X_test, y_test)
 
 
 # Scoring the model
@@ -1060,7 +966,4 @@ print(f"""
 Full model KNN score:    {y_score.round(3)}
 Optimal model KNN score: {y_score_knn_optimal.round(3)}
 Optimal model OLS score: {y_score_ols_optimal.round(3)}
-Adj R-Square LM Full:    {rsq_lm_full}
-Adj R-Square LM Signf:    {rsq_lm_significant}
-Adj R-Square LM Signf (stat):    {rsq_lm_stat_significant}
 """)
