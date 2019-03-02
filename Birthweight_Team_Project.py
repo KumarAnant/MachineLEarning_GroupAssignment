@@ -5,7 +5,7 @@ Created on Wed Feb 27 19:44:26 2019
 
 @author: Martina Cerina
 
-Workdirectory: /Users/marti/Desktop/HULT/MBAN/Machine learning
+Workdirectory: /Users/ludovicaflocco/Desktop/Machine_Learning
 """
 
 # Loading Libraries
@@ -23,7 +23,6 @@ import sklearn.metrics # more metrics for model performance evaluation
 from sklearn.model_selection import cross_val_score # k-folds cross validation
 
 os.chdir('E:/OneDrive/Hult/Machine Learning/Assignments/Group Assignment/Data')
-
 file = 'birthweight.xlsx'
 
 birthweight = pd.read_excel(file)
@@ -163,25 +162,25 @@ print(
       .any()
       )
 
-# ###############################################################################
-# # Outlier Analysis
-# ###############################################################################
+###############################################################################
+# Outlier Analysis
+###############################################################################
 
-# birthweight_quantiles = birthweight.loc[:, :].quantile([0.20,
-#                                                 0.40,
-#                                                 0.60,
-#                                                 0.80,
-#                                                 1.00])
+birthweight_quantiles = birthweight.loc[:, :].quantile([0.20,
+                                                0.40,
+                                                0.60,
+                                                0.80,
+                                                1.00])
 
     
-# print(birthweight_quantiles)
+print(birthweight_quantiles)
 
-# for col in birthweight:
-#     print(col)
+for col in birthweight:
+    print(col)
 
-# ########################
-# # Visual EDA (Histograms)
-# ########################
+########################
+# Visual EDA (Histograms)
+########################
 
 
 plt.subplot(2, 2, 1)
@@ -215,7 +214,7 @@ plt.xlabel('monpre')
 
 
 
-# ########################
+########################
 
 
 plt.subplot(2, 2, 4)
@@ -331,218 +330,286 @@ plt.savefig('Birthweight Data Histograms 3.png')
 
 plt.show()
 
-# ########################
-# # Tuning and Flagging Outliers
-# ########################
+########################
+# Tuning and Flagging Outliers
+########################
 
-# birthweight_quantiles = birthweight.loc[:, :].quantile([0.05,
-#                                                 0.40,
-#                                                 0.60,
-#                                                 0.80,
-#                                                 0.95])
-
-
-# """
-
-# Assumed Continuous/Interval Variables - 
-
-# Mother's age
-# Mother's education
-# Month Prenatal Care began
-# Number of Prenatal Visits
-# Father's Age
-# Father's Education
-# One Minute apgar score
-# Five Minute's apgar score
-# Average cigaretts per day
-# Average drinks per day
-# Birthweigh grams 
-
-# Binary Classifiers -
-
-# Baby male 
-# Mother white
-# Mothe black 
-# Mother is other 
-# Father white 
-# Father black 
-# Father others
-
-# """
+birthweight_quantiles = birthweight.loc[:, :].quantile([0.05,
+                                                0.40,
+                                                0.60,
+                                                0.80,
+                                                0.95])
 
 
-# # Outlier flags
-# mage_low = 20
+"""
 
-# mage_high=40
+Assumed Continuous/Interval Variables - 
 
-# overall_low_meduc = 10
+Mother's age
+Mother's education
+Month Prenatal Care began
+Number of Prenatal Visits
+Father's Age
+Father's Education
+One Minute apgar score
+Five Minute's apgar score
+Average cigaretts per day
+Average drinks per day
+Birthweigh grams 
 
-# monpre_low=0.5
+Binary Classifiers -
 
-# monpre_high=4
+Baby male 
+Mother white
+Mothe black 
+Mother is other 
+Father white 
+Father black 
+Father others
 
-# npvis_low = 7
-
-# npvis_high = 16
-
-# fage_low = 20
-
-# fage_high = 45
-
-# overall_low_feduc = 10
-
-# overall_low_omaps = 5
-
-# overall_low_fmaps = 8
-
-# overall_cigs = 5
-
-# bwght_low = 2000
-
-# bwght_high = 4500
-
-# overall_drink = 1
-
-# ########################
-# # Creating Outlier Flags
-# ########################
-
-# # Building loops for outlier imputation
-
-# ########################
-# # Mage
-
-# birthweight['out_mage'] = 0
+"""
 
 
-# for val in enumerate(birthweight.loc[ : , 'mage']):
+# Outlier flags
+mage_low = 20
+
+mage_high=40
+
+overall_low_meduc = 10
+
+monpre_low=0.5
+
+monpre_high=4
+
+npvis_low = 7
+
+npvis_high = 16
+
+fage_low = 20
+
+fage_high = 45
+
+overall_low_feduc = 10
+
+overall_low_omaps = 5
+
+overall_low_fmaps = 8
+
+overall_cigs = 5
+
+bwght_low = 2000
+
+bwght_high = 4500
+
+overall_drink = 1
+
+########################
+# Creating Outlier Flags
+########################
+
+# Building loops for outlier imputation
+
+########################
+# Mage
+
+birthweight['out_mage'] = 0
+
+
+for val in enumerate(birthweight.loc[ : , 'mage']):
     
-#     if val[1] >= mage_high:
-#         birthweight.loc[val[0], 'out_mage'] = 1
+    if val[1] >= mage_high:
+        birthweight.loc[val[0], 'out_mage'] = 1
         
-#     if val[1] <= mage_low:
-#         birthweight.loc[val[0], 'out_mage'] = 0
+    if val[1] <= mage_low:
+        birthweight.loc[val[0], 'out_mage'] = -1
         
 
-# ########################
-# # Meduc
+########################
+# Meduc
 
-# birthweight['out_meduc'] = 0
+birthweight['out_meduc'] = 0
 
 
-# for val in enumerate(birthweight.loc[ : , 'meduc']):
+for val in enumerate(birthweight.loc[ : , 'meduc']):
             
-#     if val[1] <= overall_low_meduc:
-#         birthweight.loc[val[0], 'out_meduc'] = 0
+    if val[1] <= overall_low_meduc:
+        birthweight.loc[val[0], 'out_meduc'] = -1
 
 
-# ########################
-# # Monpre
+########################
+# Monpre
 
-# birthweight['out_monpre'] = 0
+birthweight['out_monpre'] = 0
 
 
-# for val in enumerate(birthweight.loc[ : , 'monpre']):
+for val in enumerate(birthweight.loc[ : , 'monpre']):
     
-#     if val[1] >= monpre_high:
-#         birthweight.loc[val[0], 'out_monpre'] = 1
+    if val[1] >= monpre_high:
+        birthweight.loc[val[0], 'out_monpre'] = 1
         
-#     if val[1] <= monpre_low:
-#         birthweight.loc[val[0], 'out_monpre'] = 0
+    if val[1] <= monpre_low:
+        birthweight.loc[val[0], 'out_monpre'] = -1
 
-# ########################
-# # Npvis
+########################
+# Npvis
 
-# birthweight['out_npvis'] = 0
+birthweight['out_npvis'] = 0
 
-# for val in enumerate(birthweight.loc[ : , 'npvis']):
+for val in enumerate(birthweight.loc[ : , 'npvis']):
     
-#     if val[1] >= npvis_high:
-#         birthweight.loc[val[0], 'out_npvis'] = 1
+    if val[1] >= npvis_high:
+        birthweight.loc[val[0], 'out_npvis'] = 1
         
-#     if val[1] <= npvis_low:
-#         birthweight.loc[val[0], 'out_npvis'] = 0
+    if val[1] <= npvis_low:
+        birthweight.loc[val[0], 'out_npvis'] = -1
         
         
-# ########################
-# # Fage
+########################
+# Fage
 
-# birthweight['out_fage'] = 0
+birthweight['out_fage'] = 0
 
-# for val in enumerate(birthweight.loc[ : , 'npvis']):
+for val in enumerate(birthweight.loc[ : , 'npvis']):
     
-#     if val[1] >= fage_high:
-#         birthweight.loc[val[0], 'out_fage'] = 1
+    if val[1] >= fage_high:
+        birthweight.loc[val[0], 'out_fage'] = 1
         
-#     if val[1] <= fage_low:
-#         birthweight.loc[val[0], 'out_fage'] = 0
+    if val[1] <= fage_low:
+        birthweight.loc[val[0], 'out_fage'] = -1
         
-# ########################
-# # Feduc
+########################
+# Feduc
 
-# birthweight['out_feduc'] = 0
+birthweight['out_feduc'] = 0
 
-# for val in enumerate(birthweight.loc[ : , 'feduc']):   
+for val in enumerate(birthweight.loc[ : , 'feduc']):   
         
-#     if val[1] <= overall_low_feduc:
-#         birthweight.loc[val[0], 'out_feduc'] = 0        
+    if val[1] <= overall_low_feduc:
+        birthweight.loc[val[0], 'out_feduc'] = -1
 
 
-# ########################
-# # Omaps
+########################
+# Omaps
 
-# birthweight['out_omaps'] = 0
+birthweight['out_omaps'] = 0
 
-# for val in enumerate(birthweight.loc[ : , 'omaps']):
+for val in enumerate(birthweight.loc[ : , 'omaps']):
         
-#     if val[1] <= overall_low_omaps:
-#         birthweight.loc[val[0], 'out_omaps'] = 0   
+    if val[1] <= overall_low_omaps:
+        birthweight.loc[val[0], 'out_omaps'] = -1
 
-# ########################
-# # Fmaps       
+########################
+# Fmaps       
 
-# birthweight['out_fmaps'] = 0
+birthweight['out_fmaps'] = 0
 
-# for val in enumerate(birthweight.loc[ : , 'fmaps']):
+for val in enumerate(birthweight.loc[ : , 'fmaps']):
 
-#     if val[1] <= overall_low_fmaps:
-#         birthweight.loc[val[0], 'out_fmaps'] = 0
+    if val[1] <= overall_low_fmaps:
+        birthweight.loc[val[0], 'out_fmaps'] = -1
         
-# ########################
-# # Cigs
+########################
+# Cigs
 
-# birthweight['out_cigs'] = 0
+birthweight['out_cigs'] = 0
 
-# for val in enumerate(birthweight.loc[ : , 'cigs']):
+for val in enumerate(birthweight.loc[ : , 'cigs']):
             
-#     if val[1] <= overall_cigs:
-#         birthweight.loc[val[0], 'out_cigs'] = 0
+    if val[1] <= overall_cigs:
+        birthweight.loc[val[0], 'out_cigs'] = -1
         
-# ########################
-# # Bwght
+########################
+# Bwght
 
-# birthweight['out_bwght'] = 0
+birthweight['out_bwght'] = 0
 
-# for val in enumerate(birthweight.loc[ : , 'bwght']):
+for val in enumerate(birthweight.loc[ : , 'bwght']):
     
-#     if val[1] >= bwght_high:
-#         birthweight.loc[val[0], 'out_bwght'] = 1
+    if val[1] >= bwght_high:
+        birthweight.loc[val[0], 'out_bwght'] = 1
         
-#     if val[1] <= bwght_low:
-#         birthweight.loc[val[0], 'out_bwght'] = 0 
+    if val[1] <= bwght_low:
+        birthweight.loc[val[0], 'out_bwght'] = -1
         
-# ########################
-# # Drink
+########################
+# Drink
 
-# birthweight['out_bwght'] = 0
+birthweight['out_drink'] = 0
 
-# for val in enumerate(birthweight.loc[ : , 'drink']):
+for val in enumerate(birthweight.loc[ : , 'drink']):
             
-#     if val[1] <= overall_drink:
-#         birthweight.loc[val[0], 'out_drink'] = 0        
+    if val[1] <= overall_drink:
+        birthweight.loc[val[0], 'out_drink'] = -1
+
+###############################################################################
+# Correlation Analysis
+###############################################################################
+
+birthweight.head()
+
+
+df_corr = birthweight.corr().round(2)
+
+
+print(df_corr)
+
+
+df_corr.loc['bwght'].sort_values(ascending = False)
         
+########################
+# Correlation Heatmap
+########################
+
+# Using palplot to view a color scheme
+sns.palplot(sns.color_palette('coolwarm', 12))
+
+fig, ax = plt.subplots(figsize=(15,15))
+ 
+df_corr2 = df_corr.iloc[1:19, 1:19]
+
+sns.heatmap(df_corr2,
+            cmap = 'coolwarm',
+            square = True,
+            annot = True,
+            linecolor = 'black',
+            linewidths = 0.5)
+
+
+plt.savefig('Variable Correlation Heatmap.png')
+plt.show()
+
+birthweight.to_excel('Birthweight_explored.xlsx')
+
+#help(corr)
+#help(pd.corr)
+#help(pd.DataFrame.corr)
+#We are often dealing with pearson correlation 
+#with unsupervised we will experience Spearman correlation   
+
+########################
+# SUMMARY BEFORE RUNNING THE MODEL
+########################
+      
 print(birthweight.head())
+
+fmaps_dummies = pd.get_dummies(list(birthweight['fmaps']), prefix = 'fmaps', drop_first = True)
+drink_dummies = pd.get_dummies(list(birthweight['drink']), prefix = 'drink', drop_first = True)
+male_dummies = pd.get_dummies(list(birthweight['male']), prefix = 'male', drop_first = True)
+mwhte_dummies = pd.get_dummies(list(birthweight['mwhte']), prefix = 'mwhte', drop_first = True)
+mblck_dummies = pd.get_dummies(list(birthweight['mblck']), prefix = 'mblck', drop_first = True)
+moth_dummies = pd.get_dummies(list(birthweight['moth']), prefix = 'moth', drop_first = True)
+fwhte_dummies = pd.get_dummies(list(birthweight['fwhte']), prefix = 'fwhte', drop_first = True)
+fblck_dummies = pd.get_dummies(list(birthweight['fblck']), prefix = 'fblck', drop_first = True)
+foth_dummies = pd.get_dummies(list(birthweight['foth']), prefix = 'foth', drop_first = True)
+
+birthweight_2 = pd.concat(
+        [birthweight.loc[:,:],
+         fmaps_dummies, drink_dummies],
+         axis = 1)
+
+birthweight_2['fmaps_5.0']
+birthweight_2.shape
+
 
 lm_full = smf.ols(formula = """bwght ~    mage +
                                           meduc +
@@ -551,16 +618,26 @@ lm_full = smf.ols(formula = """bwght ~    mage +
                                           fage +
                                           feduc +
                                           omaps +
-                                          fmaps +
+                                          birthweight_2['fmaps_5.0'] +
+                                          birthweight_2['fmaps_6.0'] +
+                                          birthweight_2['fmaps_7.0'] +
+                                          birthweight_2['fmaps_8.0'] +
+                                          birthweight_2['fmaps_9.0'] +
+                                          birthweight_2['fmaps_9.003827227993439'] +
+                                          birthweight_2['fmaps_10.0'] +
                                           cigs +
-                                          drink +
+                                          birthweight_2['drink_1.0'] +
+                                          birthweight_2['drink_2.0'] +
+                                          birthweight_2['drink_5.0'] +
+                                          birthweight_2['drink_6.0'] +
+                                          birthweight_2['drink_8.0'] +
                                           male +
                                           mwhte +
                                           mblck +
                                           moth +
                                           fwhte +
                                           fblck +
-                                          foth+                                          
+                                          foth +                                          
                                           m_meduc +
                                           m_monpre +
                                           m_npvis +
@@ -569,9 +646,20 @@ lm_full = smf.ols(formula = """bwght ~    mage +
                                           m_omaps +
                                           m_fmaps +
                                           m_cigs +
-                                          m_drink                                          
+                                          m_drink +
+                                          out_mage +
+                                          out_meduc +
+                                          out_monpre +
+                                          out_npvis +
+                                          out_fage +
+                                          out_feduc +
+                                          out_omaps +
+                                          out_fmaps +
+                                          out_cigs +
+                                          out_bwght +
+                                          out_drink
                                           """,
-                  data = birthweight)
+                  data = birthweight_2)
 
 
 # Fitting Results
@@ -597,18 +685,27 @@ Adjusted R-Squared: {results.rsquared_adj.round(3)}
 
 lm_significant = smf.ols(formula = """bwght ~   monpre +
                                                 npvis +                                                
+                                                fage +
+                                                birthweight_2['fmaps_9.0'] +
+                                                birthweight_2['fmaps_10.0'] +
                                                 omaps +
                                                 fmaps +
                                                 cigs +
                                                 male +
+                                                mwhte + 
+                                                mblck +                                                                                               
+                                                moth +
                                                 fwhte +
                                                 fblck +
                                                 m_fage +
                                                 m_omaps +
-                                                m_fmaps
+                                                m_fmaps +
+                                                out_fage +                                                
+                                                out_bwght +
+                                                out_drink
                                                 """,
-                  data = birthweight)
-
+                  data = birthweight_2)
+results.summary()
 # Fitting Results
 results = lm_significant.fit()
 
@@ -670,8 +767,6 @@ type(knn_reg)
 
 # Teaching (fitting) the algorithm based on the training data
 knn_reg.fit(X_train, y_train)
-
-
 
 # Predicting on the X_data that the model has never seen before
 y_pred = knn_reg.predict(X_test)
