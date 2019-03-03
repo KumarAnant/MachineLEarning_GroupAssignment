@@ -112,28 +112,11 @@ sns.distplot(df_dropped['drink']) #zero inflated
 # # drink is zero inflated. Imputing with zero.
 # fill = 0
 
-
-# birthweight['drink'] = birthweight['drink'].fillna(fill)
-
 #MEAN IMPUTATION FOR NPVIS VARIABLE
 
 fill = birthweight['npvis'].median()
 
 birthweight['npvis'] = birthweight['npvis'].fillna(fill)
-
-#MEAN IMPUTATION FOR FAGE VARIABLE
-
-# fill = birthweight['fage'].mean()
-
-# birthweight['fage'] = birthweight['fage'].fillna(fill)
-
-# #MEAN IMPUTATION FOR FMAPS
-
-# fill = birthweight['fmaps'].median()
-
-# birthweight['fmaps'] = birthweight['fmaps'].fillna(fill)
-
-# #EVERYTHING ELSE FILLED WITH MEDIAN
 
 fill = birthweight['meduc'].median()
 
@@ -150,14 +133,6 @@ fill = birthweight['feduc'].median()
 birthweight['feduc'] = birthweight['feduc'].fillna(fill)
 
 
-# fill = birthweight['omaps'].median()
-
-# birthweight['omaps'] = birthweight['omaps'].fillna(fill)
-
-
-# fill = birthweight['cigs'].median()
-
-# birthweight['cigs'] = birthweight['cigs'].fillna(fill)
 
 # Checking the overall dataset to verify that there are no missing values remaining
 print(
@@ -196,7 +171,6 @@ plt.xlabel('mage')
 
 
 sns.boxplot(x =birthweight['mage'])
-plt.show()
 
 
 ########################
@@ -207,7 +181,7 @@ sns.distplot(birthweight['meduc'],
              color = 'y')
 
 plt.xlabel('meduc')
-plt.show()
+
 
 
 ########################
@@ -239,9 +213,6 @@ plt.xlabel('npvis')
 
 plt.tight_layout()
 # plt.savefig('Birthweight Histograms 1.png')
-
-plt.show()
-
 
 
 ########################
@@ -337,7 +308,6 @@ plt.xlabel('bwght')
 plt.tight_layout()
 # plt.savefig('Birthweight Data Histograms 3.png')
 
-plt.show()
 
 ########################
 # Tuning and Flagging Outliers
@@ -619,7 +589,7 @@ plt.show()
 # SUMMARY BEFORE RUNNING THE MODEL
 ########################
       
-print(birthweight.head())
+#print(birthweight.head())
 
 fmaps_dummies = pd.get_dummies(list(birthweight['fmaps']), prefix = 'fmaps', drop_first = True)
 omaps_dummies = pd.get_dummies(list(birthweight['omaps']), prefix = 'omaps', drop_first = True)
@@ -752,7 +722,7 @@ results.pvalues
 
 print(results.summary())
 
-rsq_lm_full = results.rsquared_adj.round(3)
+rsq_lm_full = results.rsquared.round(3)
 
 print(f"""
 Summary Statistics:
@@ -848,7 +818,7 @@ results.rsquared_adj.round(3)
 # Printing Summary Statistics
 print(results.summary())
 
-rsq_lm_significant = results.rsquared_adj.round(3)
+rsq_lm_significant = results.rsquared.round(3)
 
 print(f"""
 Summary Statistics:
@@ -861,14 +831,14 @@ Adjusted R-Squared: {results.rsquared_adj.round(3)}
 ######### KNN FUll Model ################
 #########################################
 
-birthweight_data = birthweight.drop(['bwght'], axis = 1)
+birthweight_2_data = birthweight_2.drop(['bwght'], axis = 1)
 
-birthweight_target = birthweight.loc[:, 'bwght']
+birthweight_2_target = birthweight_2.loc[:, 'bwght']
 
 X_train, X_test, y_train, y_test = train_test_split(
-            birthweight_data,
-            birthweight_target,
-            test_size = 0.25,
+            birthweight_2_data,
+            birthweight_2_target,
+            test_size = 0.1,
             random_state = 7)
 
 # Training set 
@@ -881,48 +851,49 @@ print(y_test.shape)
 
 # We need to merge our X_train and y_train sets so that they can be
 # used in statsmodels
-birthweight_train = pd.concat([X_train, y_train], axis = 1)
+birthweight_2_train = pd.concat([X_train, y_train], axis = 1)
+birthweight_2_test = pd.concat([X_test, y_test], axis = 1)
 
 
 
-########################
-# Step 1: Create a model object
-########################
+# ########################
+# # Step 1: Create a model object
+# ########################
 
-# Creating a regressor object
-knn_reg = KNeighborsRegressor(algorithm = 'auto',
-                              n_neighbors = 1)
-
-
-
-# Checking the type of this new object
-type(knn_reg)
-
-
-# Teaching (fitting) the algorithm based on the training data
-knn_reg.fit(X_train, y_train)
-
-# Predicting on the X_data that the model has never seen before
-y_pred = knn_reg.predict(X_test)
+# # Creating a regressor object
+# knn_reg = KNeighborsRegressor(algorithm = 'auto',
+#                               n_neighbors = 1)
 
 
 
-# Printing out prediction values for each test observation
-print(f"""
-Test set predictions:
-{y_pred}
-""")
+# # Checking the type of this new object
+# type(knn_reg)
+
+
+# # Teaching (fitting) the algorithm based on the training data
+# knn_reg.fit(X_train, y_train)
+
+# # Predicting on the X_data that the model has never seen before
+# y_pred = knn_reg.predict(X_test)
 
 
 
-# Calling the score method, which compares the predicted values to the actual
-# values
-y_score = knn_reg.score(X_test, y_test)
+# # Printing out prediction values for each test observation
+# print(f"""
+# Test set predictions:
+# {y_pred}
+# """)
 
 
 
-# The score is directly comparable to R-Square
-print(y_score)
+# # Calling the score method, which compares the predicted values to the actual
+# # values
+# y_score = knn_reg.score(X_test, y_test)
+
+
+
+# # The score is directly comparable to R-Square
+# print(y_score)
 
 
 
@@ -930,33 +901,80 @@ print(y_score)
 ########### Using Stats MethodL #########
 #########################################
 
-lm_significant = smf.ols(formula = """bwght ~   monpre +
-                                                npvis +                                                
-                                                fage +
-                                                birthweight_train['fmaps_9.0'] +
-                                                birthweight_train['fmaps_10.0'] +  
-                                                birthweight_train['meduc_9.0'] +
-                                                birthweight_train['meduc_10.0'] +
-                                                fmaps +
-                                                cigs +
-                                                male +
-                                                mwhte + 
-                                                mblck +                                                                                               
-                                                moth +
-                                                fwhte +
-                                                fblck +
-                                                birthweight_train['race_001100'] +
-                                                birthweight_train['race_010001'] +
-                                                birthweight_train['race_100100'] +  
-                                                m_meduc +                                              
-                                                m_fage +
-                                                m_omaps +
-                                                m_fmaps +
-                                                out_fage +                                                
-                                                out_bwght +
-                                                out_drink-1
-                                                """,
-                  data = birthweight_train)
+lm_significant_stats = smf.ols(formula = """bwght ~   mage +
+                                          meduc +
+                                          monpre +                                          
+                                          fage +
+                                          feduc +                                          
+                                          cigs +
+                                          drink +
+                                          male +                                        
+                                          m_meduc +
+                                          m_npvis +
+                                          m_feduc +
+                                          race +
+                                          cEdu +
+                                          out_mage +
+                                          out_meduc +
+                                          out_monpre +
+                                          out_npvis +
+                                          out_fage +
+                                          out_feduc +
+                                          out_omaps +
+                                          out_fmaps +
+                                          out_cigs +
+                                          out_bwght +
+                                          out_drink +
+                                          birthweight_2_train['omaps_3'] +
+                                          birthweight_2_train['omaps_4'] +
+                                          birthweight_2_train['omaps_5'] +
+                                          birthweight_2_train['omaps_6'] +
+                                          birthweight_2_train['omaps_7'] +
+                                          birthweight_2_train['omaps_8'] +
+                                          birthweight_2_train['omaps_9'] +
+                                          birthweight_2_train['omaps_10'] +                                          
+                                          birthweight_2_train['fmaps_6'] +
+                                          birthweight_2_train['fmaps_7'] +
+                                          birthweight_2_train['fmaps_8'] +
+                                          birthweight_2_train['fmaps_9'] +
+                                          birthweight_2_train['fmaps_10'] +
+                                          birthweight_2_train['meduc_10.0'] +
+                                          birthweight_2_train['meduc_11.0'] +
+                                          birthweight_2_train['meduc_12.0'] +
+                                          birthweight_2_train['meduc_13.0'] +
+                                          birthweight_2_train['meduc_14.0'] +
+                                          birthweight_2_train['meduc_15.0'] +
+                                          birthweight_2_train['meduc_16.0'] +
+                                          birthweight_2_train['meduc_17.0'] +
+                                          birthweight_2_train['race_001010'] + 
+                                          birthweight_2_train['race_001100'] +
+                                          birthweight_2_train['race_010001'] +
+                                          birthweight_2_train['race_010010'] +
+                                          birthweight_2_train['race_010100'] +
+                                          birthweight_2_train['race_100100'] +
+                                          birthweight_2_train['npvis_3.0'] +
+                                          birthweight_2_train['npvis_5.0'] +
+                                          birthweight_2_train['npvis_6.0'] +
+                                          birthweight_2_train['npvis_7.0'] +
+                                          birthweight_2_train['npvis_8.0'] +
+                                          birthweight_2_train['npvis_9.0'] +
+                                          birthweight_2_train['npvis_10.0'] +
+                                          birthweight_2_train['npvis_11.0'] +
+                                          birthweight_2_train['npvis_12.0'] +
+                                          birthweight_2_train['npvis_13.0'] +
+                                          birthweight_2_train['npvis_14.0'] +
+                                          birthweight_2_train['npvis_15.0'] +
+                                          birthweight_2_train['npvis_16.0'] +
+                                          birthweight_2_train['npvis_17.0'] +
+                                          birthweight_2_train['npvis_18.0'] +
+                                          birthweight_2_train['npvis_19.0'] +
+                                          birthweight_2_train['npvis_20.0'] +
+                                          birthweight_2_train['npvis_25.0'] +
+                                          birthweight_2_train['npvis_30.0'] +
+                                          birthweight_2_train['npvis_31.0'] +
+                                          birthweight_2_train['npvis_35.0']
+                                          """,
+                  data = birthweight_2_train)
 # Fitting Results
 results = lm_significant.fit()
 
@@ -965,36 +983,69 @@ results = lm_significant.fit()
 # Printing Summary Statistics
 print(results.summary())
 
-rsq_lm_stat_significant = results.rsquared_adj.round(3)
+rsq_lm_stat_significant = results.rsquared.round(3)
+
+#rsq_lm_stat_significant_test = lm_significant_stats.predict(X_test)
 
 ###############################################################################
 # Applying the Optimal Model in scikit-learn
 ###############################################################################
-birthweight_data   = birthweight_2.loc[:,['monpre',
-                                          'npvis',                                              
+
+
+birthweight_data   = birthweight_2.loc[:,['mage',
+                                          'meduc',
+                                          'monpre',
                                           'fage',
-                                          'fmaps_9.0',
-                                          'fmaps_10.0',
-                                          'meduc_9.0',
-                                          'meduc_10.0',
-                                          'fmaps',
+                                          'feduc',
                                           'cigs',
+                                          'drink',
                                           'male',
-                                          'mwhte' ,
-                                          'mblck',                                                                                             
-                                          'moth',
-                                          'fwhte',
-                                          'fblck',
-                                          'race_001100',
-                                          'race_010001',
-                                          'race_100100',
-                                          'm_meduc',                                         
-                                          'm_fage',
-                                          'm_omaps',
-                                          'm_fmaps',
+                                          'm_meduc',
+                                          'm_npvis',
+                                          'm_feduc',
+                                          'race',
+                                          'out_mage',
+                                          'out_meduc',
+                                          'out_monpre',
+                                          'out_npvis',
                                           'out_fage',
+                                          'out_feduc',
+                                          'out_omaps',
+                                          'out_fmaps',
+                                          'out_cigs',
                                           'out_bwght',
-                                          'out_drink'
+                                          'out_drink',
+                                          'omaps',                                          
+                                          'fmaps',                                          
+                                          'meduc',                                                                                    
+                                          'npvis',
+                                          'omaps_3',
+                                          'omaps_4',
+                                          'omaps_5',
+                                          'omaps_6', 
+                                          'omaps_7', 
+                                          'omaps_8', 
+                                          'omaps_9', 
+                                          'omaps_10',
+                                          'fmaps_6', 
+                                          'fmaps_7', 
+                                          'fmaps_8', 
+                                          'fmaps_9', 
+                                          'fmaps_10', 
+                                          'meduc_10.0', 
+                                          'meduc_11.0', 
+                                          'meduc_12.0', 
+                                          'meduc_13.0', 
+                                          'meduc_14.0', 
+                                          'meduc_15.0', 
+                                          'meduc_16.0', 
+                                          'meduc_17.0', 
+                                          'race_001010', 
+                                          'race_001100', 
+                                          'race_010001', 
+                                          'race_010010', 
+                                          'race_010100', 
+                                          'race_100100'
                                           ]]
 
 # Preparing the target variable
@@ -1005,7 +1056,7 @@ birthweight_target = birthweight_2.loc[:, 'bwght']
 X_train, X_test, y_train, y_test = train_test_split(
             birthweight_data,
             birthweight_target,
-            test_size = 0.25,
+            test_size = 0.1,
             random_state = 7)
 
 ########################
@@ -1040,15 +1091,15 @@ plt.xlabel("n_neighbors")
 plt.legend()
 plt.show()
 
-print(test_accuracy)
+print(max(test_accuracy))
 
 print("Best test accuracy at N = ",test_accuracy.index(max(test_accuracy)))
 
 ########################
-# The best results occur when k = 10.
+# The best results occur when k = 3.
 ########################
 
-# Building a model with k = 14
+# Building a model with k = 3
 knn_reg = KNeighborsRegressor(algorithm = 'auto',
                               n_neighbors = test_accuracy.index(max(test_accuracy)))
 
@@ -1072,6 +1123,12 @@ print(y_score_knn_optimal)
 # Generating Predictions based on the optimal KNN model
 knn_reg_optimal_pred = knn_reg_fit.predict(X_test)
 
+# Predictions
+y_pred = knn_reg.predict(X_test)
+print(f"""
+Test set predictions:
+{y_pred.round(2)}
+""")
 
 ########################
 ## Does OLS predict better than KNN?
@@ -1082,7 +1139,7 @@ from sklearn.linear_model import LinearRegression
 X_train, X_test, y_train, y_test = train_test_split(
             birthweight_data,
             birthweight_target,
-            test_size = 0.25,
+            test_size = 0.05,
             random_state = 7)
 
 
@@ -1101,19 +1158,15 @@ lr_pred = lr_fit.predict(X_test)
 
 print(f"""
 Test set predictions:
-{y_pred.round(2)}
+{lr_pred.round(2)}
 """)
-
-# # Scoring the model
-# y_score_ols_optimal = lr_fit.score(X_test, y_test)
-
 
 # Scoring the model
 y_score_ols_optimal = lr_fit.score(X_test, y_test)
 
 
 # The score is directly comparable to R-Square
-print(y_score_ols_optimal)
+print("Fit score of scikit LR model: ",y_score_ols_optimal)
 
 
 # Let's compare the testing score to the training score.
@@ -1121,6 +1174,12 @@ print(y_score_ols_optimal)
 print('Training Score', lr.score(X_train, y_train).round(4))
 print('Testing Score:', lr.score(X_test, y_test).round(4))
 
+cv_lr_3 = cross_val_score(lr,
+                          birthweight_data,
+                          birthweight_target,
+                          cv = 3)
+
+print("Cross validation score of LR: ", (pd.np.mean(cv_lr_3)))
 
 """
 Prof. Chase:
@@ -1132,10 +1191,11 @@ Prof. Chase:
 
 # Printing model results
 print(f"""
-Full model KNN score:    {y_score.round(3)}
-Optimal model KNN score: {y_score_knn_optimal.round(3)}
-Optimal model OLS score: {y_score_ols_optimal.round(3)}
-Adj R-Square LM Full:    {rsq_lm_full}
-Adj R-Square LM Signf:    {rsq_lm_significant}
-Adj R-Square LM Signf (stat):    {rsq_lm_stat_significant}
+Optimal model KNN score:      {y_score_knn_optimal.round(3)}
+Optimal model OLS score:      {y_score_ols_optimal.round(3)}
+CrossValidation (CV 3) score: {pd.np.mean(cv_lr_3).round(3)}
+R-Square LM Full:             {rsq_lm_full.round(3)}
+R-Square LM Signf:            {rsq_lm_significant.round(3)}
+R-Square LM Signf (stat):     {rsq_lm_stat_significant.round(3)}
 """)
+
