@@ -238,7 +238,7 @@ plt.xlabel('npvis')
 
 
 plt.tight_layout()
-plt.savefig('Birthweight Histograms 1.png')
+# plt.savefig('Birthweight Histograms 1.png')
 
 plt.show()
 
@@ -293,7 +293,7 @@ plt.xlabel('fmaps')
 
 
 plt.tight_layout()
-plt.savefig('Birthweight Data Histograms 2.png')
+# plt.savefig('Birthweight Data Histograms 2.png')
 
 plt.show()
 
@@ -335,7 +335,7 @@ plt.xlabel('bwght')
 
 
 plt.tight_layout()
-plt.savefig('Birthweight Data Histograms 3.png')
+# plt.savefig('Birthweight Data Histograms 3.png')
 
 plt.show()
 
@@ -402,17 +402,17 @@ fage_high = 62
 
 overall_low_feduc = 7
 
-overall_low_omaps = 5
+overall_low_omaps = 4
 
-overall_low_fmaps = 8
+overall_low_fmaps = 6
 
-overall_cigs = 5
+overall_cigs = 19
 
-bwght_low = 2000
+bwght_low = 2500
 
 bwght_high = 4500
 
-overall_drink = 1
+overall_drink = 11
 
 ########################
 # Create a new column for Race and cEdu
@@ -496,7 +496,7 @@ for val in enumerate(birthweight.loc[ : , 'npvis']):
 
 birthweight['out_fage'] = 0
 
-for val in enumerate(birthweight.loc[ : , 'npvis']):
+for val in enumerate(birthweight.loc[ : , 'fage']):
     
     if val[1] >= fage_high:
         birthweight.loc[val[0], 'out_fage'] = 1
@@ -542,8 +542,8 @@ birthweight['out_cigs'] = 0
 
 for val in enumerate(birthweight.loc[ : , 'cigs']):
             
-    if val[1] <= overall_cigs:
-        birthweight.loc[val[0], 'out_cigs'] = -1
+    if val[1] >= overall_cigs:
+        birthweight.loc[val[0], 'out_cigs'] = 1
         
 ########################
 # Bwght
@@ -565,8 +565,8 @@ birthweight['out_drink'] = 0
 
 for val in enumerate(birthweight.loc[ : , 'drink']):
             
-    if val[1] <= overall_drink:
-        birthweight.loc[val[0], 'out_drink'] = -1
+    if val[1] >= overall_drink:
+        birthweight.loc[val[0], 'out_drink'] = 1
 
 
 
@@ -604,10 +604,10 @@ sns.heatmap(df_corr2,
             linewidths = 0.5)
 
 
-plt.savefig('Variable Correlation Heatmap.png')
+# plt.savefig('Variable Correlation Heatmap.png')
 plt.show()
 
-birthweight.to_excel('Birthweight_explored.xlsx')
+# birthweight.to_excel('Birthweight_explored.xlsx')
 
 #help(corr)
 #help(pd.corr)
@@ -622,9 +622,11 @@ birthweight.to_excel('Birthweight_explored.xlsx')
 print(birthweight.head())
 
 fmaps_dummies = pd.get_dummies(list(birthweight['fmaps']), prefix = 'fmaps', drop_first = True)
+omaps_dummies = pd.get_dummies(list(birthweight['omaps']), prefix = 'omaps', drop_first = True)
 drink_dummies = pd.get_dummies(list(birthweight['drink']), prefix = 'drink', drop_first = True)
 meduc_dummies = pd.get_dummies(list(birthweight['meduc']), prefix = 'meduc', drop_first = True)
 race_dummies = pd.get_dummies(list(birthweight['race']), prefix = 'race', drop_first = True)
+npvis_dummies = pd.get_dummies(list(birthweight['npvis']), prefix = 'npvis', drop_first = True)
 # male_dummies = pd.get_dummies(list(birthweight['male']), prefix = 'male', drop_first = True)
 # mwhte_dummies = pd.get_dummies(list(birthweight['mwhte']), prefix = 'mwhte', drop_first = True)
 # mblck_dummies = pd.get_dummies(list(birthweight['mblck']), prefix = 'mblck', drop_first = True)
@@ -636,68 +638,33 @@ race_dummies = pd.get_dummies(list(birthweight['race']), prefix = 'race', drop_f
 birthweight_2 = pd.concat(
         [birthweight.loc[:,:],
          fmaps_dummies, drink_dummies, 
-         meduc_dummies, race_dummies],
+         meduc_dummies, race_dummies,
+         omaps_dummies, npvis_dummies
+         ],
          axis = 1)
 
 birthweight_2.columns
 
-
+birthweight_2['bwght']
 lm_full = smf.ols(formula = """bwght ~    mage +
-                                          birthweight_2['meduc_5.0'] +
-                                          birthweight_2['meduc_6.0'] +
-                                          birthweight_2['meduc_7.0'] +
-                                          birthweight_2['meduc_8.0'] +
-                                          birthweight_2['meduc_9.0'] +
-                                          birthweight_2['meduc_10.0'] +
-                                          birthweight_2['meduc_11.0'] +
-                                          birthweight_2['meduc_12.0'] +
-                                          birthweight_2['meduc_13.0'] +
-                                          birthweight_2['meduc_14.0'] +
-                                          birthweight_2['meduc_15.0'] +
-                                          birthweight_2['meduc_16.0'] +
-                                          birthweight_2['meduc_17.0'] +
-                                          monpre +
-                                          npvis +
+                                          meduc +
+                                          monpre +                                          
                                           fage +
-                                          feduc +
-                                          omaps +
-                                          birthweight_2['fmaps_5.0'] +
-                                          birthweight_2['fmaps_6.0'] +
-                                          birthweight_2['fmaps_7.0'] +
-                                          birthweight_2['fmaps_8.0'] +
-                                          birthweight_2['fmaps_9.0'] +                                          
-                                          birthweight_2['fmaps_10.0'] +
+                                          feduc +                                          
                                           cigs +
-                                          birthweight_2['drink_1.0'] +
-                                          birthweight_2['drink_2.0'] +
-                                          birthweight_2['drink_5.0'] +
-                                          birthweight_2['drink_6.0'] +
-                                          birthweight_2['drink_8.0'] +
+                                          drink +
                                           male +
                                           mwhte +
                                           mblck +
                                           moth +
                                           fwhte +
                                           fblck +
-                                          foth +
-                                          birthweight_2['race_001010'] +
-                                          birthweight_2['race_001100'] +
-                                          birthweight_2['race_010001'] +
-                                          birthweight_2['race_010010'] +
-                                          birthweight_2['race_010100'] +
-                                          birthweight_2['race_100001'] +
-                                          birthweight_2['race_100010'] +
-                                          birthweight_2['race_100100'] +
-                                          birthweight_2['cEdu'] +
+                                          foth +                                          
                                           m_meduc +
-                                          m_monpre +
                                           m_npvis +
-                                          m_fage +
                                           m_feduc +
-                                          m_omaps +
-                                          m_fmaps +
-                                          m_cigs +
-                                          m_drink +
+                                          race +
+                                          cEdu +
                                           out_mage +
                                           out_meduc +
                                           out_monpre +
@@ -708,7 +675,69 @@ lm_full = smf.ols(formula = """bwght ~    mage +
                                           out_fmaps +
                                           out_cigs +
                                           out_bwght +
-                                          out_drink
+                                          out_drink +
+                                          birthweight_2['omaps_3'] +
+                                          birthweight_2['omaps_4'] +
+                                          birthweight_2['omaps_5'] +
+                                          birthweight_2['omaps_6'] +
+                                          birthweight_2['omaps_7'] +
+                                          birthweight_2['omaps_8'] +
+                                          birthweight_2['omaps_9'] +
+                                          birthweight_2['omaps_10'] +                                          
+                                          birthweight_2['fmaps_6'] +
+                                          birthweight_2['fmaps_7'] +
+                                          birthweight_2['fmaps_8'] +
+                                          birthweight_2['fmaps_9'] +
+                                          birthweight_2['fmaps_10'] +
+                                          birthweight_2['drink_1'] +
+                                          birthweight_2['drink_2'] +
+                                          birthweight_2['drink_3'] +
+                                          birthweight_2['drink_4'] +
+                                          birthweight_2['drink_5'] +
+                                          birthweight_2['drink_6'] +
+                                          birthweight_2['drink_7'] +
+                                          birthweight_2['drink_8'] +
+                                          birthweight_2['drink_9'] +
+                                          birthweight_2['drink_10'] +
+                                          birthweight_2['drink_11'] +
+                                          birthweight_2['drink_12'] +
+                                          birthweight_2['drink_13'] +
+                                          birthweight_2['drink_14'] +
+                                          birthweight_2['meduc_10.0'] +
+                                          birthweight_2['meduc_11.0'] +
+                                          birthweight_2['meduc_12.0'] +
+                                          birthweight_2['meduc_13.0'] +
+                                          birthweight_2['meduc_14.0'] +
+                                          birthweight_2['meduc_15.0'] +
+                                          birthweight_2['meduc_16.0'] +
+                                          birthweight_2['meduc_17.0'] +
+                                          birthweight_2['race_001010'] + 
+                                          birthweight_2['race_001100'] +
+                                          birthweight_2['race_010001'] +
+                                          birthweight_2['race_010010'] +
+                                          birthweight_2['race_010100'] +
+                                          birthweight_2['race_100100'] +
+                                          birthweight_2['npvis_3.0'] +
+                                          birthweight_2['npvis_5.0'] +
+                                          birthweight_2['npvis_6.0'] +
+                                          birthweight_2['npvis_7.0'] +
+                                          birthweight_2['npvis_8.0'] +
+                                          birthweight_2['npvis_9.0'] +
+                                          birthweight_2['npvis_10.0'] +
+                                          birthweight_2['npvis_11.0'] +
+                                          birthweight_2['npvis_12.0'] +
+                                          birthweight_2['npvis_13.0'] +
+                                          birthweight_2['npvis_14.0'] +
+                                          birthweight_2['npvis_15.0'] +
+                                          birthweight_2['npvis_16.0'] +
+                                          birthweight_2['npvis_17.0'] +
+                                          birthweight_2['npvis_18.0'] +
+                                          birthweight_2['npvis_19.0'] +
+                                          birthweight_2['npvis_20.0'] +
+                                          birthweight_2['npvis_25.0'] +
+                                          birthweight_2['npvis_30.0'] +
+                                          birthweight_2['npvis_31.0'] +
+                                          birthweight_2['npvis_35.0']
                                           """,
                   data = birthweight_2)
 
@@ -736,37 +765,84 @@ Adjusted R-Squared: {results.rsquared_adj.round(3)}
 # Significant Model
 ########################
 
-lm_significant = smf.ols(formula = """bwght ~   monpre +
-                                                npvis +                                                
-                                                fage +
-                                                birthweight_2['fmaps_9.0'] +
-                                                birthweight_2['fmaps_10.0'] +  
-                                                birthweight_2['meduc_9.0'] +
-                                                birthweight_2['meduc_10.0'] +
-                                                fmaps +
-                                                cigs +
-                                                male +
-                                                mwhte + 
-                                                mblck +                                                                                               
-                                                moth +
-                                                fwhte +
-                                                fblck +
-                                                birthweight_2['race_001100'] +
-                                                birthweight_2['race_010001'] +
-                                                birthweight_2['race_100100'] +  
-                                                m_meduc +                                              
-                                                m_fage +
-                                                m_omaps +
-                                                m_fmaps +
-                                                out_fage +                                                
-                                                out_bwght +
-                                                out_drink
-                                                """,
+lm_significant = smf.ols(formula = """bwght ~   mage +
+                                          meduc +
+                                          monpre +                                          
+                                          fage +
+                                          feduc +                                          
+                                          cigs +
+                                          drink +
+                                          male +                                        
+                                          m_meduc +
+                                          m_npvis +
+                                          m_feduc +
+                                          race +
+                                          cEdu +
+                                          out_mage +
+                                          out_meduc +
+                                          out_monpre +
+                                          out_npvis +
+                                          out_fage +
+                                          out_feduc +
+                                          out_omaps +
+                                          out_fmaps +
+                                          out_cigs +
+                                          out_bwght +
+                                          out_drink +
+                                          birthweight_2['omaps_3'] +
+                                          birthweight_2['omaps_4'] +
+                                          birthweight_2['omaps_5'] +
+                                          birthweight_2['omaps_6'] +
+                                          birthweight_2['omaps_7'] +
+                                          birthweight_2['omaps_8'] +
+                                          birthweight_2['omaps_9'] +
+                                          birthweight_2['omaps_10'] +                                          
+                                          birthweight_2['fmaps_6'] +
+                                          birthweight_2['fmaps_7'] +
+                                          birthweight_2['fmaps_8'] +
+                                          birthweight_2['fmaps_9'] +
+                                          birthweight_2['fmaps_10'] +
+                                          birthweight_2['meduc_10.0'] +
+                                          birthweight_2['meduc_11.0'] +
+                                          birthweight_2['meduc_12.0'] +
+                                          birthweight_2['meduc_13.0'] +
+                                          birthweight_2['meduc_14.0'] +
+                                          birthweight_2['meduc_15.0'] +
+                                          birthweight_2['meduc_16.0'] +
+                                          birthweight_2['meduc_17.0'] +
+                                          birthweight_2['race_001010'] + 
+                                          birthweight_2['race_001100'] +
+                                          birthweight_2['race_010001'] +
+                                          birthweight_2['race_010010'] +
+                                          birthweight_2['race_010100'] +
+                                          birthweight_2['race_100100'] +
+                                          birthweight_2['npvis_3.0'] +
+                                          birthweight_2['npvis_5.0'] +
+                                          birthweight_2['npvis_6.0'] +
+                                          birthweight_2['npvis_7.0'] +
+                                          birthweight_2['npvis_8.0'] +
+                                          birthweight_2['npvis_9.0'] +
+                                          birthweight_2['npvis_10.0'] +
+                                          birthweight_2['npvis_11.0'] +
+                                          birthweight_2['npvis_12.0'] +
+                                          birthweight_2['npvis_13.0'] +
+                                          birthweight_2['npvis_14.0'] +
+                                          birthweight_2['npvis_15.0'] +
+                                          birthweight_2['npvis_16.0'] +
+                                          birthweight_2['npvis_17.0'] +
+                                          birthweight_2['npvis_18.0'] +
+                                          birthweight_2['npvis_19.0'] +
+                                          birthweight_2['npvis_20.0'] +
+                                          birthweight_2['npvis_25.0'] +
+                                          birthweight_2['npvis_30.0'] +
+                                          birthweight_2['npvis_31.0'] +
+                                          birthweight_2['npvis_35.0']
+                                          """,                                                
                   data = birthweight_2)
 
 # Fitting Results
 results = lm_significant.fit()
-
+results.rsquared_adj.round(3)
 
 
 # Printing Summary Statistics
@@ -785,9 +861,9 @@ Adjusted R-Squared: {results.rsquared_adj.round(3)}
 ######### KNN FUll Model ################
 #########################################
 
-birthweight_data = birthweight_2.drop(['bwght'], axis = 1)
+birthweight_data = birthweight.drop(['bwght'], axis = 1)
 
-birthweight_target = birthweight_2.loc[:, 'bwght']
+birthweight_target = birthweight.loc[:, 'bwght']
 
 X_train, X_test, y_train, y_test = train_test_split(
             birthweight_data,
@@ -895,7 +971,7 @@ rsq_lm_stat_significant = results.rsquared_adj.round(3)
 # Applying the Optimal Model in scikit-learn
 ###############################################################################
 birthweight_data   = birthweight_2.loc[:,['monpre',
-                                          'npvis',                                                
+                                          'npvis',                                              
                                           'fage',
                                           'fmaps_9.0',
                                           'fmaps_10.0',
@@ -905,18 +981,18 @@ birthweight_data   = birthweight_2.loc[:,['monpre',
                                           'cigs',
                                           'male',
                                           'mwhte' ,
-                                          'mblck'                                                                                             ,
+                                          'mblck',                                                                                             
                                           'moth',
                                           'fwhte',
                                           'fblck',
                                           'race_001100',
                                           'race_010001',
                                           'race_100100',
-                                          'm_meduc',
+                                          'm_meduc',                                         
                                           'm_fage',
                                           'm_omaps',
                                           'm_fmaps',
-                                          'out_fage'                                                ,
+                                          'out_fage',
                                           'out_bwght',
                                           'out_drink'
                                           ]]
@@ -955,7 +1031,6 @@ for n_neighbors in neighbors_settings:
     
     # record generalization accuracy
     test_accuracy.append(clf.score(X_test, y_test))
-
 
 
 plt.plot(neighbors_settings, training_accuracy, label = "training accuracy")
