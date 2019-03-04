@@ -318,8 +318,6 @@ birthweight_quantiles = birthweight.loc[:, :].quantile([0.05,
                                                 0.60,
                                                 0.80,
                                                 0.95])
-birthweight_quantiles = birthweight.loc[:, :].quantile([0.02,                                                
-                                                0.98])
 
 print(birthweight_quantiles['mage'])
 """
@@ -389,7 +387,7 @@ overall_drink = 11
 
 birthweight['race'] = 0
 birthweight['cEdu'] = 0
-
+abc = birthweight['cigs']
 for val in enumerate(birthweight.loc[ : , 'fwhte']):
       birthweight.loc[val[0], 'race'] =   str(birthweight.loc[val[0], 'mwhte']) + \
                                           str(birthweight.loc[val[0], 'mblck']) + \
@@ -595,8 +593,10 @@ fmaps_dummies = pd.get_dummies(list(birthweight['fmaps']), prefix = 'fmaps', dro
 omaps_dummies = pd.get_dummies(list(birthweight['omaps']), prefix = 'omaps', drop_first = True)
 drink_dummies = pd.get_dummies(list(birthweight['drink']), prefix = 'drink', drop_first = True)
 meduc_dummies = pd.get_dummies(list(birthweight['meduc']), prefix = 'meduc', drop_first = True)
+feduc_dummies = pd.get_dummies(list(birthweight['feduc']), prefix = 'feduc', drop_first = True)
 race_dummies = pd.get_dummies(list(birthweight['race']), prefix = 'race', drop_first = True)
 npvis_dummies = pd.get_dummies(list(birthweight['npvis']), prefix = 'npvis', drop_first = True)
+cigs_dummies = pd.get_dummies(list(birthweight['cigs']), prefix = 'cigs', drop_first = True)
 # male_dummies = pd.get_dummies(list(birthweight['male']), prefix = 'male', drop_first = True)
 # mwhte_dummies = pd.get_dummies(list(birthweight['mwhte']), prefix = 'mwhte', drop_first = True)
 # mblck_dummies = pd.get_dummies(list(birthweight['mblck']), prefix = 'mblck', drop_first = True)
@@ -609,20 +609,61 @@ birthweight_2 = pd.concat(
         [birthweight.loc[:,:],
          fmaps_dummies, drink_dummies, 
          meduc_dummies, race_dummies,
-         omaps_dummies, npvis_dummies
-         ],
+         omaps_dummies, npvis_dummies,
+         cigs_dummies, feduc_dummies],
          axis = 1)
 
-birthweight_2.columns
+birthweight_2['C_wM'] = birthweight_2['male'] * birthweight_2['mwhte']
+birthweight_2['C_bM'] = birthweight_2['male'] * birthweight_2['mblck']
+birthweight_2['C_oM'] = birthweight_2['male'] * birthweight_2['moth']
+birthweight_2['C_bF'] = birthweight_2['male'] * birthweight_2['fblck']
+birthweight_2['C_bM'] = birthweight_2['male'] * birthweight_2['mblck']
+birthweight_2['cigolic'] = birthweight_2['cigs'] * birthweight_2['drink']
+birthweight_2['edu'] = birthweight_2['feduc'] * birthweight_2['meduc']
+birthweight_2['oth'] = birthweight_2['foth'] * birthweight_2['moth']
+# birthweight_2['blck'] = birthweight_2['fblck'] * birthweight_2['mblck']  DOes not give result
+# birthweight_2['whte'] = birthweight_2['fwhte'] * birthweight_2['mwhte']
 
-birthweight_2['bwght']
-lm_full = smf.ols(formula = """bwght ~    mage +
-                                          meduc +
+
+#birthweight_2.to_excel('abcd.xlsx')
+lm_full = smf.ols(formula = """bwght ~    mage +                                          
                                           monpre +                                          
                                           fage +
-                                          feduc +                                          
-                                          cigs +
-                                          drink +
+                                          birthweight_2['feduc_7.0'] +
+                                          birthweight_2['feduc_8.0'] +
+                                          birthweight_2['feduc_10.0'] +
+                                          birthweight_2['feduc_11.0'] +
+                                          birthweight_2['feduc_12.0'] +
+                                          birthweight_2['feduc_13.0'] +
+                                          birthweight_2['feduc_14.0'] +
+                                          birthweight_2['feduc_15.0'] +
+                                          birthweight_2['feduc_16.0'] +
+                                          birthweight_2['feduc_17.0'] +                                         
+                                          birthweight_2['cigs_1'] +
+                                          birthweight_2['cigs_2'] +
+                                          birthweight_2['cigs_3'] +
+                                          birthweight_2['cigs_4'] +
+                                          birthweight_2['cigs_5'] +
+                                          birthweight_2['cigs_6'] +
+                                          birthweight_2['cigs_7'] +
+                                          birthweight_2['cigs_8'] +
+                                          birthweight_2['cigs_9'] +
+                                          birthweight_2['cigs_10'] +
+                                          birthweight_2['cigs_11'] +
+                                          birthweight_2['cigs_12'] +
+                                          birthweight_2['cigs_13'] +
+                                          birthweight_2['cigs_14'] +
+                                          birthweight_2['cigs_15'] +
+                                          birthweight_2['cigs_16'] +
+                                          birthweight_2['cigs_17'] +
+                                          birthweight_2['cigs_18'] +
+                                          birthweight_2['cigs_19'] +
+                                          birthweight_2['cigs_20'] +
+                                          birthweight_2['cigs_21'] +
+                                          birthweight_2['cigs_22'] +
+                                          birthweight_2['cigs_23'] +
+                                          birthweight_2['cigs_24'] +
+                                          birthweight_2['cigs_25'] +                                          
                                           male +
                                           mwhte +
                                           mblck +
@@ -632,8 +673,7 @@ lm_full = smf.ols(formula = """bwght ~    mage +
                                           foth +                                          
                                           m_meduc +
                                           m_npvis +
-                                          m_feduc +
-                                          race +
+                                          m_feduc +                                          
                                           cEdu +
                                           out_mage +
                                           out_meduc +
@@ -735,8 +775,7 @@ Adjusted R-Squared: {results.rsquared_adj.round(3)}
 # Significant Model
 ########################
 
-lm_significant = smf.ols(formula = """bwght ~   mage +
-                                          meduc +
+lm_significant = smf.ols(formula = """bwght ~   mage +                                          
                                           monpre +                                          
                                           fage +
                                           feduc +                                          
@@ -839,7 +878,7 @@ X_train, X_test, y_train, y_test = train_test_split(
             birthweight_2_data,
             birthweight_2_target,
             test_size = 0.1,
-            random_state = 7)
+            random_state = 508)
 
 # Training set 
 print(X_train.shape)
@@ -992,60 +1031,46 @@ rsq_lm_stat_significant = results.rsquared.round(3)
 ###############################################################################
 
 
-birthweight_data   = birthweight_2.loc[:,['mage',
-                                          'meduc',
-                                          'monpre',
-                                          'fage',
-                                          'feduc',
-                                          'cigs',
-                                          'drink',
+birthweight_data   = birthweight_2.loc[:,['mage',                                         
+                                          'cigs',                                 
                                           'male',
+                                          'mwhte',
+                                          'mblck',
+                                          'moth',
+                                          'fwhte',
+                                          'fblck',
+                                          'foth',
                                           'm_meduc',
                                           'm_npvis',
                                           'm_feduc',
-                                          'race',
+                                          'cEdu',
+                                          'C_wM',
+                                          'C_bM',
+                                          'C_bF',
+                                          'oth',
+                                          'cigolic',
+                                          'edu',
                                           'out_mage',
                                           'out_meduc',
                                           'out_monpre',
                                           'out_npvis',
                                           'out_fage',
-                                          'out_feduc',
-                                          'out_omaps',
-                                          'out_fmaps',
+                                          'out_feduc',                                          
                                           'out_cigs',
                                           'out_bwght',
                                           'out_drink',
-                                          'omaps',                                          
-                                          'fmaps',                                          
-                                          'meduc',                                                                                    
-                                          'npvis',
-                                          'omaps_3',
-                                          'omaps_4',
-                                          'omaps_5',
-                                          'omaps_6', 
-                                          'omaps_7', 
-                                          'omaps_8', 
-                                          'omaps_9', 
-                                          'omaps_10',
-                                          'fmaps_6', 
-                                          'fmaps_7', 
-                                          'fmaps_8', 
-                                          'fmaps_9', 
-                                          'fmaps_10', 
-                                          'meduc_10.0', 
-                                          'meduc_11.0', 
-                                          'meduc_12.0', 
-                                          'meduc_13.0', 
-                                          'meduc_14.0', 
-                                          'meduc_15.0', 
-                                          'meduc_16.0', 
-                                          'meduc_17.0', 
-                                          'race_001010', 
-                                          'race_001100', 
-                                          'race_010001', 
-                                          'race_010010', 
-                                          'race_010100', 
-                                          'race_100100'
+                                          'drink_4',
+                                          'drink_5',
+                                          'drink_6',
+                                          'drink_7',
+                                          'drink_8',
+                                          'drink_9',
+                                          'drink_10',
+                                          'drink_11',
+                                          'drink_12',
+                                          'drink_13',
+                                          'drink_14',
+                                          'npvis'                                                                                                                  
                                           ]]
 
 # Preparing the target variable
@@ -1057,7 +1082,7 @@ X_train, X_test, y_train, y_test = train_test_split(
             birthweight_data,
             birthweight_target,
             test_size = 0.1,
-            random_state = 7)
+            random_state = 508)
 
 ########################
 # Using KNN  on the optimal model (same code as before)
@@ -1139,14 +1164,13 @@ from sklearn.linear_model import LinearRegression
 X_train, X_test, y_train, y_test = train_test_split(
             birthweight_data,
             birthweight_target,
-            test_size = 0.05,
-            random_state = 7)
+            test_size = 0.1,
+            random_state = 508)
 
 
 
 # Prepping the Model
 lr = LinearRegression(fit_intercept = False)
-
 
 # Fitting the model
 lr_fit = lr.fit(X_train, y_train)
@@ -1198,4 +1222,3 @@ R-Square LM Full:             {rsq_lm_full.round(3)}
 R-Square LM Signf:            {rsq_lm_significant.round(3)}
 R-Square LM Signf (stat):     {rsq_lm_stat_significant.round(3)}
 """)
-
