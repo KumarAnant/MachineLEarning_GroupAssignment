@@ -1227,3 +1227,40 @@ R-Square LM Full:             {rsq_lm_full.round(3)}
 R-Square LM Signf:            {rsq_lm_significant.round(3)}
 R-Square LM Signf (stat):     {rsq_lm_stat_significant.round(3)}
 """)
+
+quant = birthweight['mage'].quantile([0.25, 0.50, 0.75, 1])
+birthweight.loc[2, 'quant'] = 0
+for val in enumerate(birthweight.loc[ : , 'mage']):
+      print(val[1])
+      if val[1] <= quant.iloc[0]:
+            birthweight.loc[val[0], 'quant'] = 25
+            
+      elif val[1] <= quant.iloc[1]: 
+            birthweight.loc[val[0], 'quant'] = 50
+            
+      elif val[1] <= quant.iloc[2]:
+            birthweight.loc[val[0], 'quant'] = 75
+            
+      else:
+            birthweight.loc[val[0], 'quant'] = 100
+            
+x = birthweight.groupby('quant')['bwght'].mean()
+x.iloc[2]
+quant[1]
+sns.catplot(x = quant, y = x, kind = 'boxen')
+
+
+import matplotlib.pyplot as plt; plt.rcdefaults()
+import matplotlib.pyplot as plt
+ 
+
+objects = ('Q1 ' + str(quant.iloc[0]), 'Q2 ' + str(quant.iloc[1]), 'Q3 ' + str(quant.iloc[2]), 'Q1 ' + str(quant.iloc[3]))
+y_pos = np.arange(len(objects))
+performance = [x.iloc[0], x.iloc[1], x.iloc[2], x.iloc[3]]
+
+plt.bar(y_pos, performance, align='center', alpha=0.5)
+plt.xticks(y_pos, objects)
+plt.ylabel('Birthweight')
+plt.title('MOTHER AGE vs Birthweight')
+plt.savefig('mage_Bwt.png')
+plt.show()

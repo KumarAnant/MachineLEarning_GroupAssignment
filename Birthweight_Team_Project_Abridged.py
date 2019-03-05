@@ -970,7 +970,7 @@ Test set predictions:
 """)
 
 #############################################
-## LinearRegression model forfrom scikitlearn
+## LinearRegression model from scikitlearn
 ############################################
 
 from sklearn.linear_model import LinearRegression
@@ -998,6 +998,8 @@ print(f"""
 Test set predictions:
 {lr_pred.round(2)}
 """)
+# Saving the prediction ot result.xlsx
+pd.DataFrame(lr_pred).to_excel('result.xlsx', index=True)
 
 # Scoring the model
 y_score_ols_optimal = lr_fit.score(X_test, y_test)
