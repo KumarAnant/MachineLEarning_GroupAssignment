@@ -767,7 +767,7 @@ Adjusted R-Squared: {results.rsquared_adj.round(3)}
 
 
 ###############################################################################
-# Applying the Optimal Model in scikit-learn
+# Preparing data for scikit-learn
 ###############################################################################
 
 ## Creating data with selective features 
@@ -780,10 +780,6 @@ birthweight_data   = birthweight_2.loc[:,['mage',
                                           'fwhte',
                                           'fblck',
                                           'foth',
-                                          'fmaps',
-                                          'omaps',
-                                          'out_omaps',
-                                          'out_fmaps',
                                           'm_meduc',
                                           'm_npvis',
                                           'm_feduc',
@@ -829,7 +825,7 @@ X_train, X_test, y_train, y_test = train_test_split(
             random_state = 508)
 
 ##########################################
-######### LM Significant model ###########
+######### OLS LR significant model ###########
 ##########################################
 birthweight_OLS_train = pd.concat([X_train, y_train], axis=1)
 birthweight_OLS_test = pd.concat([X_test, y_test], axis=1)
@@ -843,10 +839,6 @@ lm_significant = smf.ols(formula = """bwght ~   mage +
                                                 fwhte +
                                                 fblck +
                                                 foth +
-                                                fmaps +
-                                                omaps +
-                                                out_omaps +
-                                                out_fmaps +
                                                 m_meduc +
                                                 m_npvis +
                                                 m_feduc +
@@ -1002,11 +994,11 @@ Test set predictions:
 pd.DataFrame(lr_pred).to_excel('result.xlsx', index=True)
 
 # Scoring the model
-y_score_ols_optimal = lr_fit.score(X_test, y_test)
+y_score_scikitLR_optimal = lr_fit.score(X_test, y_test)
 
 
 # The score is directly comparable to R-Square
-print("Fit score of scikit LR model: ",y_score_ols_optimal)
+print("Fit score of scikit LR model: ",y_score_scikitLR_optimal)
 
 
 # Let's compare the testing score to the training score.
@@ -1032,8 +1024,8 @@ Prof. Chase:
 # Printing model results
 print(f"""
 Optimal model KNN score:        {y_score_knn_optimal.round(3)}
-Optimal model OLS score:        {y_score_ols_optimal.round(3)}
+Optimal scikitLR model score:   {y_score_scikitLR_optimal.round(3)}
 CrossValidation (CV 3) score:   {pd.np.mean(cv_lr_3).round(3)}
-R-Square LM Full:               {rsq_lm_full.round(3)}
-R-Square LM Optimal :           {rsq_lm_significant.round(3)}
+R-Square OLS Full:              {rsq_lm_full.round(3)}
+R-Square OLS Optimal :          {rsq_lm_significant.round(3)}
 """)
